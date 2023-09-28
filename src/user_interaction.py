@@ -1,3 +1,6 @@
+from src.api_classes import HHApi
+from src.json_operations import JSon
+from src.vacancy import Vacancy
 
 
 def user_interaction():
@@ -23,3 +26,45 @@ def user_interaction():
         print("Возникла ошибка при получении данных с сайта: ", e)
         return
 
+    JSon('vacancies_from_hh.json', hh_vacancies).write_info()
+    Vacancy.hh_create_list_of_objects('vacancies_from_hh.json')
+
+    # запрос от пользователя для выбора зарубежных вакансий
+    input_region = input('Показать доступные вакансии за рубежом и вакансии с возможностью переезда? (Да/Нет): ')
+    if input_region.lower() == 'да':
+        hh_foreign_vacancies = [vacancy for vacancy in Vacancy.hh_list_of_objects if
+                                vacancy.salary['currency'] != 'RUR']
+
+        print('\nДоступны следующие вакансии за рубежом и вакансии с возможностью переезда:')
+        for job in hh_foreign_vacancies:
+            print(f'{job}\n')
+
+    hh_list = [vacancy for vacancy in Vacancy.hh_list_of_objects if
+               vacancy.salary['to'] is not None and vacancy.salary['currency'] == 'RUR']
+    hh_list.sort(key=lambda x: x.salary['to'], reverse=True)
+
+    print('Список вакансий с наибольшим уровнем оплаты труда:\n')
+    for vacancy in hh_list[:input_top_number]:
+        print(vacancy)
+
+    hh_sorted_area = [work for work in Vacancy.hh_list_of_objects if work.area == input_area]
+
+    if not hh_sorted_area:
+        print('Вакансий по заданному городу не найдено')
+        print("1. Промотр текущих вакансий")
+        print("2. Просмотр архивных вакансий")
+
+        choice = input("Сделайте выбор: ")
+
+        if choice == '1':
+            vacancies = HHApi.get_vacancies()
+            print('\n'.join(map(str, vacancies)))
+        elif choice == '2':
+            vacancies = JSon('vacancies_from_hh.json', hh_vacancies).get_archived_vacancies()
+            print('\n'.join(map(str, vacancies)))
+        else:
+            print("Неверный выбор")
+    else:
+        print('Список вакансий по заданному городу: ')
+        for work_in_city in hh_sorted_area:
+            print(work_in_city)
