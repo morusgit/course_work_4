@@ -33,27 +33,45 @@ class Json(ABC):
         """
         pass
 
+def _perform_write(data, file_obj):
+    if file_obj is None:
+        return
+    try:
+        better_format = json.dumps(data, indent=2, ensure_ascii=False)
+        file_obj.write(better_format)
+    except Exception as e:
+        print(f"Exception occurred while writing to file: {e}")
 
-class JSon(Json):
+
+class JsonFileHandler(Json):
+
+    def _open_file(self, mode):
+        try:
+            return open(self.file, mode, encoding="utf-8")
+        except Exception as e:
+            print(f"Exception occurred while opening the file: {e}")
+            return None
+
     def write_info(self):
-        with open(self.file, "wt", encoding='utf-8') as vacancies_from_hh:
-            better_format = json.dumps(self.vacancies, indent=2, ensure_ascii=False)
-            vacancies_from_hh.write(better_format)
+        with self._open_file("wt") as vacancies_from_hh:
+            _perform_write(self.vacancies, vacancies_from_hh)
 
     def add_info(self):
-        with open(self.file, encoding='utf-8') as json_str:
-            python_obj = json.load(json_str)
-        for vacancy in self.vacancies:
-            python_obj.append(vacancy)
-        with open(self.file, 'wt', encoding='utf-8') as further_json:
-            empty_ll = json.dumps(python_obj, indent=2, ensure_ascii=False)
-            further_json.write(empty_ll)
+        with self._open_file("r+t") as vacancies_from_hh:
+            if vacancies_from_hh is None:
+                return
+            try:
+                python_obj = json.load(vacancies_from_hh)
+                python_obj.extend(self.vacancies)
+                _perform_write(python_obj, vacancies_from_hh)
+            except Exception as e:
+                print(f"Exception occurred while adding information to file: {e}")
 
     def delete_info(self):
-        with open(self.file, "wt") as js_file:
-            js_file.truncate()
+        with self._open_file("wt") as vacancies_from_hh:
+            if vacancies_from_hh is not None:
+                try:
+                    vacancies_from_hh.truncate()
+                except Exception as e:
+                    print(f"Exception occurred while deleting information from file: {e}")
 
-    def get_archived_vacancies(self):
-        with open(self.file, 'r', encoding='utf-8') as jobs:
-            archived_vacancies = json.load(jobs)
-        return archived_vacancies
