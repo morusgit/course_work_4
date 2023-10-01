@@ -17,7 +17,7 @@ def user_interaction():
     if input_platform not in ['hh', 'HH', 'headhunter', 'HeadHunter', 'sj', 'SJ', 'Super', 'SuperJob']:
         quit('С такой платформой работать пока не умею')
     else:
-        input_keyword = input('Введите ключевое слово для поиска вакансии на сайте HeadHunter: ')
+        input_keyword = input('Введите название вакансии для поиска: ')
         input_page_number = int(
         input('С какой страницы получать информацию? Для получения самых свежих данных укажите 0: '))
         input_top_number = int(input('Сколько вакансий с самой высокой оплатой труда показать? (Только для RU-региона): '))
