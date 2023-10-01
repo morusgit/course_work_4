@@ -89,8 +89,11 @@ class Vacancy:
                 raise Exception('Валюты не совпадают')
 
     def __str__(self):
-        salary_str = f'От {self.salary["from"]} до {self.salary["to"]} {self.salary["currency"]}' if self.salary else 'Не указано'
-        reqs_str = self.reqs if self.reqs else 'Не указаны'
-
-        return f' |Вакансия: {self.name}\nЗарплата: {salary_str}\nТребования: {reqs_str}\n' \
-               f'Город: {self.area}\nРаботодатель: {self.employer}\nСсылка: {self.url}\n'
+        if self.responsibilities == 'См. атрибут reqs':
+            return f' |Вакансия: {self.name}\nЗарплата: {self.salary["from"]} - {self.salary["to"]} ' \
+                   f'{self.salary["currency"]}\n{self.reqs}\nГород: {self.area}\n' \
+                   f'Работодатель: {self.employer}\nСсылка: {self.url}\n'
+        else:
+            return f' |Вакансия: {self.name}\nЗарплата: {self.salary["from"]} - {self.salary["to"]} ' \
+                   f'{self.salary["currency"]}\nТребования: {self.reqs}\nГород: {self.area}\n' \
+                   f'Работодатель: {self.employer}\nСсылка: {self.url}\n'
