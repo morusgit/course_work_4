@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 class ApiGetter(ABC):
     def __init__(self, change_page, vacancy_name):
         """
-
         :param change_page: страница сайта, получаем данные
         :param vacancy_name: ключевое слово, по которому получаем вакансии
         """
@@ -36,4 +35,20 @@ class HHApi(ApiGetter):
         vacancies_info = python_type['items']
         if len(vacancies_info) == 0:
             raise Exception('Нет информации по такому запросу ')
+        return vacancies_info
+
+class SuperJobApi(ApiGetter):
+    """
+    Класс для SuperJob
+    """
+    def get_info_from_site(self):
+        header = {'X-Api-App-Id':
+                  'v3.r.137847641.00c3bdb49d07ee5b0bc86e33af91fc5e8bb46604.71136f73b8e0166b8f6cd857f20835d7079223da'}
+        response = requests.get('https://api.superjob.ru/2.0/vacancies/?page={}&keyword={}&count=100'.format
+                                (self.change_page, self.vacancy_name),
+                                headers=header)
+        python_type = json.loads(response.text)
+        vacancies_info = python_type['objects']
+        if len(vacancies_info) == 0:
+            raise Exception('Нет информации по такой профессии')
         return vacancies_info
